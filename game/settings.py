@@ -1,20 +1,28 @@
 # ディスプレイ設定
-display_width = 500
-display_height = 500
-fps = 60
-display_color = (255, 253, 208)
+SCREEN_WIDTH = 500
+SCREEN_HEIGHT = 500
+FPS = 60
+BG_COLOR = (255, 253, 208)
 
 # board設定
-board_width = 9
-board_height = 9
-board_color = (26, 26, 26)
-board_origin = (25, 25)
-board_square_size = 50
+BOARD_COLS = 9
+BOARD_ROWS = 9
+BOARD_COLOR = (26, 26, 26)
+BOARD_ORIGIN = (25, 25)
+CELL_SIZE = 50
 
 # piece設定
-piece_radious = 20
-width_color = (0, 0, 0)
+PIECE_RADIUS = 20
+WIDTH_COLOR = (0, 0, 0)
 
 # red_piace設定
-red_color = (255,0,0)
-red_start_position = (4, 7)
+RED_COLOR = (231,76,60)
+RED_START_POSITION = (4, 7)
+
+# blue_piace設定
+BLUE_COLOR = (52,152,219)
+BLUE_START_POSITION = (2, 7)
+
+# green_piace設定
+GREEN_COLOR = (39,174,96)
+GREEN_START_POSITION = (6, 7)

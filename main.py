@@ -8,25 +8,41 @@ def start():
 
     # pygame初期設定
     pygame.init()
-    screen = pygame.display.set_mode((settings.display_width, settings.display_height))
+    screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
     pygame.display.set_caption("シューティネスト")
     clock = pygame.time.Clock()
 
     # 盤面初期化
     main_board = board.Board(
-        settings.board_width, 
-        settings.board_height,
-        settings.board_color,
-        settings.board_origin,
-        settings.board_square_size 
+        settings.BOARD_COLS, 
+        settings.BOARD_ROWS,
+        settings.BOARD_COLOR,
+        settings.BOARD_ORIGIN,
+        settings.CELL_SIZE 
     )
     
     # 赤駒初期化
     red_piece = piece.Piece(
-        settings.red_color,
-        settings.red_start_position,
-        settings.piece_radious, 
-        settings.width_color
+        settings.RED_COLOR,
+        settings.RED_START_POSITION,
+        settings.PIECE_RADIUS, 
+        settings.WIDTH_COLOR
+    )
+
+    # 青駒初期化
+    blue_piece = piece.Piece(
+        settings.BLUE_COLOR,
+        settings.BLUE_START_POSITION,
+        settings.PIECE_RADIUS, 
+        settings.WIDTH_COLOR
+    )
+
+    # 緑駒初期化
+    green_piece = piece.Piece(
+        settings.GREEN_COLOR,
+        settings.GREEN_START_POSITION,
+        settings.PIECE_RADIUS, 
+        settings.WIDTH_COLOR
     )
 
     # 毎秒実行する関数
@@ -38,13 +54,15 @@ def start():
                 running = False
     
         # オブジェクトの描画
-        screen.fill(settings.display_color)
+        screen.fill(settings.BG_COLOR)
         main_board.draw(screen)
         red_piece.draw(screen, main_board.size,main_board.origin)
+        blue_piece.draw(screen, main_board.size,main_board.origin)
+        green_piece.draw(screen, main_board.size,main_board.origin)
 
         # 画面更新
         pygame.display.flip()
-        clock.tick(settings.fps)
+        clock.tick(settings.FPS)
     
 
 
