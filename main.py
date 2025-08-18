@@ -1,6 +1,7 @@
 import pygame
 import game.settings as settings
 import game.board as board
+import game.piece as piece
 
 def start():
     """起動時に実行される関数"""
@@ -17,10 +18,16 @@ def start():
         settings.board_height,
         settings.board_color,
         settings.board_origin,
-        screen,
         settings.board_square_size 
     )
     
+    # 赤駒初期化
+    red_piece = piece.Piece(
+        settings.red_color,
+        settings.red_start_position,
+        settings.piece_radious, 
+        settings.width_color
+    )
 
     # 毎秒実行する関数
     running = True
@@ -32,7 +39,8 @@ def start():
     
         # オブジェクトの描画
         screen.fill(settings.display_color)
-        main_board.draw()
+        main_board.draw(screen)
+        red_piece.draw(screen, main_board.size,main_board.origin)
 
         # 画面更新
         pygame.display.flip()
