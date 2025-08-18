@@ -15,9 +15,17 @@ class Board:
             for j in range(self.width):
                 pygame.draw.rect(self.screen,
                                  (0, 0, 0),
-                                 ((settings.display_width - self.size*9)/2 + j * self.size,
-                                  (settings.display_height - self.size*9)/2 + i * self.size, 
+                                 (self.origin[0] + j * self.size,
+                                  self.origin[1] + i * self.size, 
                                   self.size, 
                                   self.size),
-                                  width=2)
+                                 width=1)
+        pygame.draw.rect(self.screen,
+                                 (0, 0, 0),
+                                 (self.origin[0],
+                                  self.origin[1],
+                                  self.size * self.height, 
+                                  self.size * self.width),
+                                 width=4)
+                
         
