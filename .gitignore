@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+
+# Builds / Distribute (例: PyInstaller 等)
+build/
+dist/
+*.spec
+/builds/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
