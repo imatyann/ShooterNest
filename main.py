@@ -1,5 +1,6 @@
 import pygame
-import game.settings as settings 
+import game.settings as settings
+import game.board as board
 
 def start():
     """起動時に実行される関数"""
@@ -10,6 +11,17 @@ def start():
     pygame.display.set_caption("シューティネスト")
     clock = pygame.time.Clock()
 
+    # 盤面初期化
+    main_board = board.Board(
+        settings.board_width, 
+        settings.board_height,
+        settings.board_color,
+        settings.board_origin,
+        screen,
+        settings.board_square_size 
+    )
+    
+
     # 毎秒実行する関数
     running = True
     while running:
@@ -18,15 +30,18 @@ def start():
             if event.type == pygame.QUIT:
                 running = False
     
+        # オブジェクトの描画
+        screen.fill(settings.display_color)
+        main_board.draw()
+
         # 画面更新
         pygame.display.flip()
         clock.tick(settings.fps)
     
+
+
     # pygameを終了
     pygame.quit()
-
-
-
 
 # start関数の実行
 if __name__ == "__main__":
