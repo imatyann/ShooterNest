@@ -1,4 +1,6 @@
 import pygame
+import math
+
 import game.settings as settings
 import game.board as board
 import game.piece as piece
@@ -50,9 +52,15 @@ def start():
     while running:
         # 操作の受け付け
         for event in pygame.event.get():
+            # ウィンドウの終了
             if event.type == pygame.QUIT:
                 running = False
-    
+            # 駒のクリック判定
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                pos_mouse = event.pos
+                if red_piece.tatch(pos_mouse,main_board.origin, main_board.size):
+                    red_piece.move((2,2))
+
         # オブジェクトの描画
         screen.fill(settings.BG_COLOR)
         main_board.draw(screen)

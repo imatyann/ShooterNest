@@ -26,5 +26,4 @@ class Board:
                                   self.size * self.height, 
                                   self.size * self.width),
                                  width=4)
-                
-        
+    
