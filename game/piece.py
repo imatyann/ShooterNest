@@ -45,9 +45,11 @@ class Piece:
             return True
         else:
             return False
-    
-    # def clicked(self,selected_piece):
-    #     if selected_piece == self:
-    #         self.is_selected = True
-    #     else:
-    #         self.is_selected = False
+
+    def highlight_cells(self,occupied,board):
+        can_move = [(1,0),(-1,0),(0,1),(0,-1)]
+        board.highlight_cell.clear()
+        for cell in can_move:
+            if not ((self.current[0] + cell[0], self.current[1] + cell[1]) in occupied):
+                board.highlight_cell.append((self.current[0] + cell[0], self.current[1] + cell[1]))
+            print(board.highlight_cell)

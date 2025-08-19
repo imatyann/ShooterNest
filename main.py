@@ -20,7 +20,9 @@ def start():
         settings.BOARD_ROWS,
         settings.BOARD_COLOR,
         settings.BOARD_ORIGIN,
-        settings.CELL_SIZE 
+        settings.CELL_SIZE,
+        [],
+        settings.HIGHLIGHT_COLOR        
     )
     selected_piece = None
     
@@ -56,10 +58,15 @@ def start():
     occupied[red_piece.current] = red_piece
     occupied[blue_piece.current] = blue_piece
     occupied[green_piece.current] = green_piece
+
+
     
     # 毎秒実行する関数
     running = True
     while running:
+        # 盤面の描画
+        screen.fill(settings.BG_COLOR)
+
         # 操作の受け付け
         for event in pygame.event.get():
             # ウィンドウの終了
@@ -67,19 +74,21 @@ def start():
                 running = False
             # 駒のクリック判定
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                main_board.highlight_cell.clear()
                 pos_mouse = event.pos
                 if red_piece.tatch(pos_mouse,main_board.origin, main_board.size):
                     selected_piece = red_piece
+                    red_piece.highlight_cells(occupied,main_board)
                 elif blue_piece.tatch(pos_mouse,main_board.origin, main_board.size):
                     selected_piece = blue_piece
+                    blue_piece.highlight_cells(occupied,main_board)
                 elif green_piece.tatch(pos_mouse,main_board.origin, main_board.size):
                     selected_piece = green_piece
+                    green_piece.highlight_cells(occupied,main_board)
                 else:
                     selected_piece = None
 
-        # オブジェクトの描画
-        screen.fill(settings.BG_COLOR)
-        
+        # スクリプトの描画
         main_board.draw(screen)
         
         red_piece.draw(screen, main_board.size,main_board.origin,selected_piece)
