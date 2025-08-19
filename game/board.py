@@ -41,3 +41,18 @@ class Board:
                     self.size),
                     width=2
                     )
+    
+    def pos_to_cell(self,pos):
+        cell_pos_x = pos[0] - self.origin[0]
+        cell_pos_y = pos[1] - self.origin[1]
+
+        if (cell_pos_x < 0 or cell_pos_y < 0):
+            return None
+        
+        cell_x = cell_pos_x // self.size
+        cell_y = cell_pos_y // self.size
+
+        if (cell_x >= self.width or cell_y >= self.height):
+            return None
+
+        return (cell_x, cell_y)

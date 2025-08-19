@@ -74,8 +74,9 @@ def start():
                 running = False
             # 駒のクリック判定
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                main_board.highlight_cell.clear()
                 pos_mouse = event.pos
+                clicked_cell = main_board.pos_to_cell(pos_mouse)
+
                 if red_piece.tatch(pos_mouse,main_board.origin, main_board.size):
                     selected_piece = red_piece
                     red_piece.highlight_cells(occupied,main_board)
@@ -85,8 +86,20 @@ def start():
                 elif green_piece.tatch(pos_mouse,main_board.origin, main_board.size):
                     selected_piece = green_piece
                     green_piece.highlight_cells(occupied,main_board)
+                elif clicked_cell in main_board.highlight_cell:
+                    if clicked_cell != None:
+                        delete_ = occupied.pop(selected_piece.current, None)
+                        occupied
+                        selected_piece.move(clicked_cell)
+                        occupied[selected_piece.current] = selected_piece
+                        main_board.highlight_cell.clear()
+                        print(occupied)
                 else:
                     selected_piece = None
+                    main_board.highlight_cell.clear()
+            
+
+
 
         # スクリプトの描画
         main_board.draw(screen)

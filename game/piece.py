@@ -50,6 +50,7 @@ class Piece:
         can_move = [(1,0),(-1,0),(0,1),(0,-1)]
         board.highlight_cell.clear()
         for cell in can_move:
-            if not ((self.current[0] + cell[0], self.current[1] + cell[1]) in occupied):
+            next_cell = (self.current[0] + cell[0], self.current[1] + cell[1])
+
+            if not ((next_cell in occupied) or (next_cell[0] <= -1) or (next_cell[1] <= -1) or (next_cell[0] >= board.width) or (next_cell[1] >= board.height)):
                 board.highlight_cell.append((self.current[0] + cell[0], self.current[1] + cell[1]))
-            print(board.highlight_cell)
