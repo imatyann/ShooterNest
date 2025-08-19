@@ -20,13 +20,17 @@ WIDTH_COLOR = (0, 0, 0)
 RED_COLOR = (231,76,60)
 RED_START_POSITION = (3, 7)
 RED_SELECTED_COLOR = (192,57,43)
+RED_CAN_MOVE = [(1,0),(-1,0),(0,1),(0,-1),(-1,-1),(1,1),(-1,1),(1,-1),(0,2),(0,-2)]
 
 # blue_piace設定
 BLUE_COLOR = (52,152,219)
 BLUE_START_POSITION = (2, 7)
 BLUE_SELECTED_COLOR = (41,128,185)
+BLUE_CAN_MOVE = [(1,0),(-1,0),(0,1),(0,-1)]
+
 
 # green_piace設定
 GREEN_COLOR = (39,174,96)
 GREEN_START_POSITION = (6, 7)
 GREEN_SELECTED_COLOR = (33,139,90)
+GREEN_CAN_MOVE = [(1,0),(-1,0),(0,1),(0,-1),(2,2),(-2,-2),(-2,2),(2,-2)]

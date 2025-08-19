@@ -21,10 +21,11 @@ def start():
         settings.BOARD_COLOR,
         settings.BOARD_ORIGIN,
         settings.CELL_SIZE,
-        [],
         settings.HIGHLIGHT_COLOR        
     )
     selected_piece = None
+    highlight_cells = set()
+
     
     # 赤駒初期化
     red_piece = piece.Piece(
@@ -32,7 +33,8 @@ def start():
         settings.RED_START_POSITION,
         settings.PIECE_RADIUS, 
         settings.WIDTH_COLOR,
-        settings.RED_SELECTED_COLOR
+        settings.RED_SELECTED_COLOR,
+        settings.RED_CAN_MOVE
     )
 
     # 青駒初期化
@@ -41,7 +43,8 @@ def start():
         settings.BLUE_START_POSITION,
         settings.PIECE_RADIUS, 
         settings.WIDTH_COLOR,
-        settings.BLUE_SELECTED_COLOR
+        settings.BLUE_SELECTED_COLOR,
+        settings.BLUE_CAN_MOVE
     )
 
     # 緑駒初期化
@@ -50,7 +53,8 @@ def start():
         settings.GREEN_START_POSITION,
         settings.PIECE_RADIUS, 
         settings.WIDTH_COLOR,
-        settings.GREEN_SELECTED_COLOR
+        settings.GREEN_SELECTED_COLOR,
+        settings.GREEN_CAN_MOVE
     )
 
     # 盤面の占有情報
@@ -72,37 +76,44 @@ def start():
             # ウィンドウの終了
             if event.type == pygame.QUIT:
                 running = False
-            # 駒のクリック判定
+            # クリック判定
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos_mouse = event.pos
                 clicked_cell = main_board.pos_to_cell(pos_mouse)
-
-                if red_piece.tatch(pos_mouse,main_board.origin, main_board.size):
+                # # ３駒に対するクリック判定
+                if red_piece.is_touched(pos_mouse,main_board.origin, main_board.size):
+                    highlight_cells.clear()
                     selected_piece = red_piece
-                    red_piece.highlight_cells(occupied,main_board)
-                elif blue_piece.tatch(pos_mouse,main_board.origin, main_board.size):
+                    can_go_cells = red_piece.can_go_cells(occupied,main_board)
+                    highlight_cells.update(can_go_cells)
+                elif blue_piece.is_touched(pos_mouse,main_board.origin, main_board.size):
+                    highlight_cells.clear()
                     selected_piece = blue_piece
-                    blue_piece.highlight_cells(occupied,main_board)
-                elif green_piece.tatch(pos_mouse,main_board.origin, main_board.size):
+                    can_go_cells = blue_piece.can_go_cells(occupied,main_board)
+                    highlight_cells.update(can_go_cells)
+                elif green_piece.is_touched(pos_mouse,main_board.origin, main_board.size):
+                    highlight_cells.clear()
                     selected_piece = green_piece
-                    green_piece.highlight_cells(occupied,main_board)
-                elif clicked_cell in main_board.highlight_cell:
-                    if clicked_cell != None:
-                        delete_ = occupied.pop(selected_piece.current, None)
-                        occupied
+                    can_go_cells = green_piece.can_go_cells(occupied,main_board)
+                    highlight_cells.update(can_go_cells)
+
+                # ハイライトクリック判定
+                elif clicked_cell in highlight_cells:
+                    if (clicked_cell is not None) and (selected_piece is not None):
+                        occupied.pop(selected_piece.current, None)
                         selected_piece.move(clicked_cell)
                         occupied[selected_piece.current] = selected_piece
-                        main_board.highlight_cell.clear()
-                        print(occupied)
+                        highlight_cells.clear()
+                # それ以外クリック判定
                 else:
                     selected_piece = None
-                    main_board.highlight_cell.clear()
+                    highlight_cells.clear()
             
 
 
 
         # スクリプトの描画
-        main_board.draw(screen)
+        main_board.draw(screen,highlight_cells)
         
         red_piece.draw(screen, main_board.size,main_board.origin,selected_piece)
 
