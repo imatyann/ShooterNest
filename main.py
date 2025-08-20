@@ -127,15 +127,18 @@ def start():
         if time % 60 == 0:
             old_cell = black_piece.current
             can_go_cells = black_piece.can_go_cells(main_board)
-            can_go_cells = {cell for cell in can_go_cells if cell not in occupied}
-            new_cell = black_piece.random_move_cell(can_go_cells)
-            black_piece.move(new_cell)
+            go_cells = {cell for cell in can_go_cells if cell not in occupied}
+            friends_positions = {p.current for p in friends}
+            attack_cells = {cell for cell in can_go_cells if cell in friends_positions}
+            new_cell = black_piece.choose_random_cell(go_cells | attack_cells)
             if new_cell is not None:
-                occupied.pop(old_cell, None)
-                occupied[new_cell] = black_piece
-            
-
-
+                if new_cell in go_cells:
+                    black_piece.move(new_cell)
+                    occupied.pop(old_cell, None)
+                    occupied[new_cell] = black_piece
+                elif new_cell in attack_cells:
+                    print("gameover")
+                    running = False
 
         # スクリプトの描画
         main_board.draw(screen,highlight_cells)

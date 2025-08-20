@@ -41,8 +41,7 @@ class Enemy:
                 result.add((self.current[0] + cell[0], self.current[1] + cell[1]))
         return result
     
-    def random_move(self,can_go_cells):
+    def choose_random_cell(self,can_go_cells):
         if can_go_cells:
             target = random.choice(list(can_go_cells))
             return target
-        
