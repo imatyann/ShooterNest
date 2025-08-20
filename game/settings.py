@@ -18,7 +18,7 @@ WIDTH_COLOR = (0, 0, 0)
 
 # red_piace設定
 RED_COLOR = (231,76,60)
-RED_START_POSITION = (3, 7)
+RED_START_POSITION = (4, 7)
 RED_SELECTED_COLOR = (192,57,43)
 RED_CAN_MOVE = [(1,0),(-1,0),(0,1),(0,-1),(-1,-1),(1,1),(-1,1),(1,-1),(0,2),(0,-2)]
 
@@ -34,3 +34,8 @@ GREEN_COLOR = (39,174,96)
 GREEN_START_POSITION = (6, 7)
 GREEN_SELECTED_COLOR = (33,139,90)
 GREEN_CAN_MOVE = [(1,0),(-1,0),(0,1),(0,-1),(2,2),(-2,-2),(-2,2),(2,-2)]
+
+# black_enemy_piece設定
+BLACK_COLOR = (50,50,50)
+BLACK_START_POSITION = (4, 2)
+BLACK_CAN_MOVE = [(1,0),(-1,0),(0,1),(0,-1)]

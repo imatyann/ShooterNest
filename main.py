@@ -4,6 +4,7 @@ import math
 import game.settings as settings
 import game.board as board
 import game.piece as piece
+import game.enemy as enemy
 
 def start():
     """起動時に実行される関数"""
@@ -25,6 +26,7 @@ def start():
     )
     selected_piece = None
     highlight_cells = set()
+    time = 0
 
     
     # 赤駒初期化
@@ -56,12 +58,24 @@ def start():
         settings.GREEN_SELECTED_COLOR,
         settings.GREEN_CAN_MOVE
     )
+    friends = [red_piece,blue_piece,green_piece]
+
+    # 黒敵駒の初期化
+    black_piece = enemy.Enemy(
+        settings.BLACK_COLOR,
+        settings.BLACK_START_POSITION,
+        settings.PIECE_RADIUS, 
+        settings.BLACK_COLOR,
+        settings.BLACK_CAN_MOVE
+    )
+    enemys = [black_piece]
 
     # 盤面の占有情報
     occupied = {}
     occupied[red_piece.current] = red_piece
     occupied[blue_piece.current] = blue_piece
     occupied[green_piece.current] = green_piece
+    occupied[black_piece.current] = black_piece
 
 
     
@@ -108,6 +122,17 @@ def start():
                 else:
                     selected_piece = None
                     highlight_cells.clear()
+        
+        # 黒敵駒のAI
+        if time % 60 == 0:
+            old_cell = black_piece.current
+            can_go_cells = black_piece.can_go_cells(main_board)
+            can_go_cells = {cell for cell in can_go_cells if cell not in occupied}
+            new_cell = black_piece.random_move_cell(can_go_cells)
+            black_piece.move(new_cell)
+            if new_cell is not None:
+                occupied.pop(old_cell, None)
+                occupied[new_cell] = black_piece
             
 
 
@@ -116,14 +141,15 @@ def start():
         main_board.draw(screen,highlight_cells)
         
         red_piece.draw(screen, main_board.size,main_board.origin,selected_piece)
-
         blue_piece.draw(screen, main_board.size,main_board.origin,selected_piece)
-
         green_piece.draw(screen, main_board.size,main_board.origin,selected_piece)
+
+        black_piece.draw(screen, main_board.size,main_board.origin)
 
         # 画面更新
         pygame.display.flip()
         clock.tick(settings.FPS)
+        time += 1
     
 
 
