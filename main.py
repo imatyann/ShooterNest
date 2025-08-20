@@ -42,7 +42,9 @@ def start():
         settings.RED_SELECTED_COLOR,
         settings.RED_CAN_MOVE,
         settings.RED_CAN_ATTACK,
-        settings.RED_DURATION
+        settings.RED_DURATION,
+        settings.RED_COOLDOWN,
+        0
     )
 
     # 青駒初期化
@@ -54,7 +56,9 @@ def start():
         settings.BLUE_SELECTED_COLOR,
         settings.BLUE_CAN_MOVE,
         settings.BLUE_CAN_ATTACK,
-        settings.BLUE_DURATION
+        settings.BLUE_DURATION,
+        settings.BLUE_COOLDOWN,
+        0
     )
 
     # 緑駒初期化
@@ -66,7 +70,9 @@ def start():
         settings.GREEN_SELECTED_COLOR,
         settings.GREEN_CAN_MOVE,
         settings.GREEN_CAN_ATTACK,
-        settings.GREEN_DURATION
+        settings.GREEN_DURATION,
+        settings.GREEN_COOLDOWN,
+        0
     )
 
     friends = [red_piece,blue_piece,green_piece]
@@ -145,32 +151,41 @@ def start():
                 clicked_cell = main_board.pos_to_cell(pos_mouse)
                 # # ３駒に対するクリック判定
                 if red_piece.is_touched(pos_mouse,main_board.origin, main_board.size):
-                    attacked_cells = red_piece.can_attack_cells(main_board)
-                    for cell in attacked_cells:
-                        now = pygame.time.get_ticks()
-                        attacked_cells_time[cell] = now + red_piece.duration
-                        if cell in occupied and occupied[cell] in enemys:
-                            occupied[cell].hit()
-                            enemys.remove(occupied.get(cell))
-                            occupied.pop(cell)
+                    now = pygame.time.get_ticks()
+                    if now > red_piece.next_attack:
+                        attacked_cells = red_piece.can_attack_cells(main_board)
+                        red_piece.next_attack = now + red_piece.cooldown
+                        for cell in attacked_cells:
+                            now = pygame.time.get_ticks()
+                            attacked_cells_time[cell] = now + red_piece.duration
+                            if cell in occupied and occupied[cell] in enemys:
+                                occupied[cell].hit()
+                                enemys.remove(occupied.get(cell))
+                                occupied.pop(cell)
                 elif blue_piece.is_touched(pos_mouse,main_board.origin, main_board.size):
-                    attacked_cells = blue_piece.can_attack_cells(main_board)
-                    for cell in attacked_cells:
-                        now = pygame.time.get_ticks()
-                        attacked_cells_time[cell] = now + blue_piece.duration
-                        if cell in occupied and occupied[cell] in enemys:
-                            occupied[cell].hit()
-                            enemys.remove(occupied.get(cell))
-                            occupied.pop(cell)
+                    now = pygame.time.get_ticks()
+                    if now > blue_piece.next_attack:
+                        attacked_cells = blue_piece.can_attack_cells(main_board)
+                        blue_piece.next_attack = now + blue_piece.cooldown
+                        for cell in attacked_cells:
+                            now = pygame.time.get_ticks()
+                            attacked_cells_time[cell] = now + blue_piece.duration
+                            if cell in occupied and occupied[cell] in enemys:
+                                occupied[cell].hit()
+                                enemys.remove(occupied.get(cell))
+                                occupied.pop(cell)
                 elif green_piece.is_touched(pos_mouse,main_board.origin, main_board.size):
-                    attacked_cells = green_piece.can_attack_cells(main_board)
-                    for cell in attacked_cells:
-                        now = pygame.time.get_ticks()
-                        attacked_cells_time[cell] = now + green_piece.duration
-                        if cell in occupied and occupied[cell] in enemys:
-                            occupied[cell].hit()
-                            enemys.remove(occupied.get(cell))
-                            occupied.pop(cell)
+                    now = pygame.time.get_ticks()
+                    if now > green_piece.next_attack:
+                        attacked_cells = green_piece.can_attack_cells(main_board)
+                        green_piece.next_attack = now + green_piece.cooldown
+                        for cell in attacked_cells:
+                            now = pygame.time.get_ticks()
+                            attacked_cells_time[cell] = now + green_piece.duration
+                            if cell in occupied and occupied[cell] in enemys:
+                                occupied[cell].hit()
+                                enemys.remove(occupied.get(cell))
+                                occupied.pop(cell)
 
         # 勝利判定
         if not enemys:

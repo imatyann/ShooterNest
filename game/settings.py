@@ -23,7 +23,8 @@ RED_START_POSITION = (4, 7)
 RED_SELECTED_COLOR = (192,57,43)
 RED_CAN_MOVE = [(1,0),(-1,0),(0,1),(0,-1),(-1,-1),(1,1),(-1,1),(1,-1),(0,2),(0,-2)]
 RED_CAN_ATTACK = {(-1,-1),(0,-1),(1,-1),(-1,-2),(0,-2),(1,-2),(-1,-3),(0,-3),(1,-3)}
-RED_DURATION= 100
+RED_DURATION = 100
+RED_COOLDOWN = 8000
 
 # blue_piace設定
 BLUE_COLOR = (52,152,219)
@@ -32,6 +33,7 @@ BLUE_SELECTED_COLOR = (41,128,185)
 BLUE_CAN_MOVE = [(1,0),(-1,0),(0,1),(0,-1)]
 BLUE_CAN_ATTACK = {(-1,-1),(0,-1),(1,-1),(0,-2),(0,-3),(0,-4),(0,-5),(0,-6)}
 BLUE_DURATION = 100
+BLUE_COOLDOWN = 4000
 
 # green_piace設定
 GREEN_COLOR = (39,174,96)
@@ -40,6 +42,7 @@ GREEN_SELECTED_COLOR = (33,139,90)
 GREEN_CAN_MOVE = [(1,0),(-1,0),(0,1),(0,-1),(2,2),(-2,-2),(-2,2),(2,-2)]
 GREEN_CAN_ATTACK = {(-1,-1),(0,-1),(1,-1),(-1,0),(1,0),(0,0),(1,1),(0,1),(-1,1)}
 GREEN_DURATION = 100
+GREEN_COOLDOWN = 12000
 
 # black_enemy_piece設定
 BLACK_COLOR = (50,50,50)

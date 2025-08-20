@@ -5,7 +5,7 @@ from . import settings
 
 class Piece:
 
-    def __init__(self, color, current, radius, width_color, selected_color, can_move, can_attack,duration):
+    def __init__(self,color,current,radius,width_color,selected_color,can_move,can_attack,duration,cooldown,next_attack):
         self.color = color
         self.current = current
         self.radius = radius
@@ -14,6 +14,8 @@ class Piece:
         self.can_move = can_move
         self.can_attack = can_attack
         self.duration = duration
+        self.cooldown = cooldown
+        self.next_attack = next_attack
     
     def center_pos(self,origin, board_square_size):
         return (
@@ -23,14 +25,14 @@ class Piece:
 
     def draw(self, screen, board_square_size, origin, selected_piece):
         if selected_piece != self:
-            current_width_color = self.color
+            current_color = self.color
             current_radius = self.radius
         else:
-            current_width_color = self.selected_color
+            current_color = self.selected_color
             current_radius = self.radius - 1
 
         pygame.draw.circle(screen, 
-                           current_width_color, 
+                           current_color, 
                            self.center_pos(origin,board_square_size), 
                            current_radius,
                            )
@@ -39,7 +41,14 @@ class Piece:
                         self.center_pos(origin,board_square_size),
                         current_radius,
                         width = 1)
-        
+
+        left = self.cooldown_left()
+        if left > 0:
+            font = pygame.font.SysFont(None, max(14, int(self.radius)))
+            text_surf = font.render(str(math.ceil(left)), True, (255, 255, 255))
+            rect = text_surf.get_rect(center=self.center_pos(origin,board_square_size))
+            screen.blit(text_surf,rect)
+
     def move(self, target):
         self.current = target
 
@@ -66,3 +75,9 @@ class Piece:
             if not ((next_cell[0] <= -1) or (next_cell[1] <= -1) or (next_cell[0] >= board.width) or (next_cell[1] >= board.height)):
                 result.add((self.current[0] + cell[0], self.current[1] + cell[1]))
         return result
+    
+    def cooldown_left(self):
+        now = pygame.time.get_ticks()
+        if self.next_attack <= now:
+            return 0.0
+        return (self.next_attack - now)/ 1000.0
