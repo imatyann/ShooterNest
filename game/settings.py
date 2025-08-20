@@ -32,7 +32,7 @@ BLUE_START_POSITION = (2, 7)
 BLUE_SELECTED_COLOR = (41,128,185)
 BLUE_CAN_MOVE = [(1,0),(-1,0),(0,1),(0,-1)]
 BLUE_CAN_ATTACK = {(-1,-1),(0,-1),(1,-1),(0,-2),(0,-3),(0,-4),(0,-5),(0,-6)}
-BLUE_DURATION = 100
+BLUE_DURATION = 1000
 BLUE_COOLDOWN = 4000
 
 # green_piace設定
