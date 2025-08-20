@@ -172,6 +172,9 @@ def start():
                             enemys.remove(occupied.get(cell))
                             occupied.pop(cell)
 
+        # 勝利判定
+        if not enemys:
+            pygame.draw.circle(screen,(255,0,0),(250,250),200,5)
 
         # 黒敵駒のAI
         friends_positions = {p.current for p in friends}
@@ -190,7 +193,7 @@ def start():
                     occupied[new_cell] = black_piece
                 elif new_cell in attack_cells:
                     print("gameover")
-                    running = True
+                    running = False
 
         # スクリプトの描画
         main_board.draw(screen,highlight_cells,attacked_cells)
