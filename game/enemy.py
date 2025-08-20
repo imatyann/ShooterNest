@@ -3,12 +3,15 @@ import random
 
 class Enemy:
 
-    def __init__(self, color, current, radius, width_color, can_move):
+    def __init__(self, color, current, radius, width_color, can_move, move_tick,alive):
         self.color = color
         self.current = current
         self.radius = radius
         self.width_color = width_color
         self.can_move = can_move
+        self.move_tick = move_tick
+        self.alive = alive
+
 
     def center_pos(self,origin, board_square_size):
         return (
@@ -17,16 +20,17 @@ class Enemy:
             )
     
     def draw(self, screen, board_square_size, origin):
-        pygame.draw.circle(screen, 
-                           self.color, 
-                           self.center_pos(origin,board_square_size), 
-                           self.radius,
-                           )
-        pygame.draw.circle(screen, 
-                        self.width_color, 
-                        self.center_pos(origin,board_square_size),
-                        self.radius,
-                        width = 1)
+        if self.alive:
+            pygame.draw.circle(screen, 
+                            self.color, 
+                            self.center_pos(origin,board_square_size), 
+                            self.radius,
+                            )
+            pygame.draw.circle(screen, 
+                            self.width_color, 
+                            self.center_pos(origin,board_square_size),
+                            self.radius,
+                            width = 1)
         
     
     def move(self, target):
@@ -45,3 +49,6 @@ class Enemy:
         if can_go_cells:
             target = random.choice(list(can_go_cells))
             return target
+    
+    def hit(self):
+        self.alive = False

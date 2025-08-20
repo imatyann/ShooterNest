@@ -5,13 +5,15 @@ from . import settings
 
 class Piece:
 
-    def __init__(self, color, current, radius, width_color, selected_color, can_move):
+    def __init__(self, color, current, radius, width_color, selected_color, can_move, can_attack,duration):
         self.color = color
         self.current = current
         self.radius = radius
         self.width_color = width_color
         self.selected_color = selected_color
         self.can_move = can_move
+        self.can_attack = can_attack
+        self.duration = duration
     
     def center_pos(self,origin, board_square_size):
         return (
@@ -53,5 +55,14 @@ class Piece:
         for cell in can_move:
             next_cell = (self.current[0] + cell[0], self.current[1] + cell[1])
             if not ((next_cell in occupied) or (next_cell[0] <= -1) or (next_cell[1] <= -1) or (next_cell[0] >= board.width) or (next_cell[1] >= board.height)):
+                result.add((self.current[0] + cell[0], self.current[1] + cell[1]))
+        return result
+    
+    def can_attack_cells(self,board):
+        can_move = self.can_attack
+        result = set()
+        for cell in can_move:
+            next_cell = (self.current[0] + cell[0], self.current[1] + cell[1])
+            if not ((next_cell[0] <= -1) or (next_cell[1] <= -1) or (next_cell[0] >= board.width) or (next_cell[1] >= board.height)):
                 result.add((self.current[0] + cell[0], self.current[1] + cell[1]))
         return result

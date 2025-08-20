@@ -2,16 +2,17 @@ import pygame
 from . import settings
 
 class Board:
-    def __init__(self, width, height, color, origin, size, highlight_color):
+    def __init__(self, width, height, color, origin, size, highlight_color,attacked_color):
         self.width = width
         self.height = height
         self.color = color
         self.origin = origin
         self.size = size
         self.highlight_color = highlight_color
+        self.attacked_color = attacked_color
 
 
-    def draw(self,screen,highlight_cells = None):
+    def draw(self,screen,highlight_cells = None,attacked_cells = None):
         for i in range(self.height):
             for j in range(self.width):
                 pygame.draw.rect(screen,
@@ -30,6 +31,8 @@ class Board:
                                  width=4)
         for cell in highlight_cells:
             self.be_highlight_cell(cell,screen)
+        for cell in attacked_cells:
+            self.be_attacked_cell(cell,screen)
         
     def be_highlight_cell(self,cell,screen):
         pygame.draw.rect(screen,
@@ -40,6 +43,24 @@ class Board:
                     self.size),
                     width=2
                     )
+    
+    def be_attacked_cell(self,cell,screen):
+        pygame.draw.rect(screen,
+                    self.attacked_color,
+                    (self.origin[0] + cell[0] * self.size,
+                    self.origin[1] + cell[1] * self.size, 
+                    self.size, 
+                    self.size)
+                    )
+        pygame.draw.rect(screen,
+                    (0,0,0),
+                    (self.origin[0] + cell[0] * self.size,
+                    self.origin[1] + cell[1] * self.size, 
+                    self.size, 
+                    self.size,),
+                    width=2
+                    )
+        
     
     def pos_to_cell(self,pos):
         cell_pos_x = pos[0] - self.origin[0]
