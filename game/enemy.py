@@ -3,14 +3,15 @@ import random
 
 class Enemy:
 
-    def __init__(self, color, current, radius, width_color, can_move, move_tick,alive):
+    def __init__(self, color, current, radius, width_color, can_move, move_interval,alive,next_move_ms):
         self.color = color
         self.current = current
         self.radius = radius
         self.width_color = width_color
         self.can_move = can_move
-        self.move_tick = move_tick
+        self.move_interval = move_interval
         self.alive = alive
+        self.next_move_ms = next_move_ms
 
 
     def center_pos(self,origin, board_square_size):

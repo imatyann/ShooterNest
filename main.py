@@ -84,9 +84,11 @@ def start():
         settings.PIECE_RADIUS, 
         settings.BLACK_COLOR,
         settings.BLACK_CAN_MOVE,
-        settings.BLACK_MOVE_TICK,
-        True
+        settings.BLACK_INTERVAL,
+        True,
+        0
     )
+
     enemies = [black_piece]
 
     # 盤面の占有情報
@@ -94,13 +96,16 @@ def start():
     occupied[red_piece.current] = red_piece
     occupied[blue_piece.current] = blue_piece
     occupied[green_piece.current] = green_piece
-    occupied[black_piece.current] = black_piece
+    for e in enemies:
+        occupied[e.current] = e
 
 
     
     # 毎秒実行する関数
     running = True
     while running:
+        now = pygame.time.get_ticks()
+
         # 盤面の描画
         screen.fill(settings.BG_COLOR)
 
@@ -149,10 +154,6 @@ def start():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
                 pos_mouse = event.pos
                 clicked_cell = main_board.pos_to_cell(pos_mouse)
-                now = pygame.time.get_ticks()
-
-
-
                 # # ３駒に対する右クリック判定
                 if red_piece.is_touched(pos_mouse,main_board.origin, main_board.size):
                     if now >= red_piece.next_attack:
@@ -186,24 +187,27 @@ def start():
         if not enemies:
             pygame.draw.circle(screen,(255,0,0),(250,250),200,5)
 
-        # 黒敵駒のAI
+        # 黒敵駒たちのAI
         friends_positions = {p.current for p in friends}
-
-        if black_piece.alive and time % black_piece.move_tick == 0:
-            old_cell = black_piece.current
-            can_go_cells = black_piece.can_go_cells(main_board)
-            go_cells = {cell for cell in can_go_cells if cell not in occupied}
+        for e in enemies:
+            if e.alive and now >= e.next_move_ms:
+                old_cell = e.current
+                can_go_cells = e.can_go_cells(main_board)
+                go_cells = {cell for cell in can_go_cells if cell not in occupied}
+                
+                attack_cells = {cell for cell in can_go_cells if cell in friends_positions}
+                new_cell = e.choose_random_cell(go_cells | attack_cells)
+                if new_cell is not None:
+                    if new_cell in go_cells:
+                        e.move(new_cell)
+                        occupied.pop(old_cell, None)
+                        occupied[new_cell] = e
+                    elif new_cell in attack_cells:
+                        print("gameover")
+                        running = False
+                e.next_move_ms = now + e.move_interval
             
-            attack_cells = {cell for cell in can_go_cells if cell in friends_positions}
-            new_cell = black_piece.choose_random_cell(go_cells | attack_cells)
-            if new_cell is not None:
-                if new_cell in go_cells:
-                    black_piece.move(new_cell)
-                    occupied.pop(old_cell, None)
-                    occupied[new_cell] = black_piece
-                elif new_cell in attack_cells:
-                    print("gameover")
-                    running = False
+
 
         # スクリプトの描画
         main_board.draw(screen,highlight_cells,set(attacked_cells_time.keys()))
@@ -211,15 +215,14 @@ def start():
         red_piece.draw(screen, main_board.size,main_board.origin,selected_piece)
         blue_piece.draw(screen, main_board.size,main_board.origin,selected_piece)
         green_piece.draw(screen, main_board.size,main_board.origin,selected_piece)
-
-        black_piece.draw(screen, main_board.size,main_board.origin)
+        for e in enemies:
+            black_piece.draw(screen, main_board.size,main_board.origin)
 
         # 画面更新
         pygame.display.flip()
         clock.tick(settings.FPS)
         time += 1
 
-        now = pygame.time.get_ticks()
         over_time_attacked_cells = [cell for cell, expire in attacked_cells_time.items() if expire < now]
 
         for cell in over_time_attacked_cells:
