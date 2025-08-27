@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 
 import game.settings as settings
 import game.board as board
@@ -23,22 +24,28 @@ def start():
         settings.BOARD_ORIGIN,
         settings.CELL_SIZE,
         settings.HIGHLIGHT_COLOR,
-        settings.ATTACKED_COLOR        
+        settings.HIGHLIGHT_EDGE_COLOR,
+        settings.ATTACKED_COLOR
     )
     selected_piece = None
     highlight_cells = set()
-    # attacked_cells = set()
     attacked_cells_time = {}
-    time = 1
-    
+    spawn_interval = settings.SPAWN_INTERVAL
+    spawn_time = pygame.time.get_ticks() + spawn_interval
+    max_enemies = settings.MAX_ENEMIES
+    enemy_spawn_cell = settings.ENEMY_SPAWN_CELLS
+    score = 0
+    state = "playing"
 
+    # スコア表示
+    score_font = pygame.font.SysFont(None, settings.SCORE_FONT_SIZE_PLAY)
     
     # 赤駒初期化
     red_piece = piece.Piece(
         settings.RED_COLOR,
         settings.RED_START_POSITION,
         settings.PIECE_RADIUS, 
-        settings.WIDTH_COLOR,
+        settings.EDGE_COLOR,
         settings.RED_SELECTED_COLOR,
         settings.RED_CAN_MOVE,
         settings.RED_CAN_ATTACK,
@@ -52,7 +59,7 @@ def start():
         settings.BLUE_COLOR,
         settings.BLUE_START_POSITION,
         settings.PIECE_RADIUS, 
-        settings.WIDTH_COLOR,
+        settings.EDGE_COLOR,
         settings.BLUE_SELECTED_COLOR,
         settings.BLUE_CAN_MOVE,
         settings.BLUE_CAN_ATTACK,
@@ -66,7 +73,7 @@ def start():
         settings.GREEN_COLOR,
         settings.GREEN_START_POSITION,
         settings.PIECE_RADIUS, 
-        settings.WIDTH_COLOR,
+        settings.EDGE_COLOR,
         settings.GREEN_SELECTED_COLOR,
         settings.GREEN_CAN_MOVE,
         settings.GREEN_CAN_ATTACK,
@@ -84,12 +91,18 @@ def start():
         settings.PIECE_RADIUS, 
         settings.BLACK_COLOR,
         settings.BLACK_CAN_MOVE,
-        settings.BLACK_INTERVAL,
+        settings.BLACK_INTERVAL_MS,
         True,
         0
     )
 
-    enemies = [black_piece]
+    # 黒敵駒2の初期化
+    black_piece2 = enemy.Enemy(settings.BLACK_COLOR,(1,1),settings.PIECE_RADIUS, settings.BLACK_COLOR,settings.BLACK_CAN_MOVE,settings.BLACK_INTERVAL_MS,True,0)
+    black_piece3 = enemy.Enemy(settings.BLACK_COLOR,(3,1),settings.PIECE_RADIUS, settings.BLACK_COLOR,settings.BLACK_CAN_MOVE,settings.BLACK_INTERVAL_MS,True,0)
+    black_piece4 = enemy.Enemy(settings.BLACK_COLOR,(5,1),settings.PIECE_RADIUS, settings.BLACK_COLOR,settings.BLACK_CAN_MOVE,settings.BLACK_INTERVAL_MS,True,0)
+    black_piece5 = enemy.Enemy(settings.BLACK_COLOR,(7,1),settings.PIECE_RADIUS, settings.BLACK_COLOR,settings.BLACK_CAN_MOVE,settings.BLACK_INTERVAL_MS,True,0)    
+    
+    enemies = [black_piece,black_piece2,black_piece3,black_piece4,black_piece5]
 
     # 盤面の占有情報
     occupied = {}
@@ -114,6 +127,11 @@ def start():
             # ウィンドウの終了
             if event.type == pygame.QUIT:
                 running = False
+
+            # ゲームの進行中以外は操作を拒否
+            if state != "playing":
+                continue
+
             # 左クリックで移動
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos_mouse = event.pos
@@ -164,6 +182,7 @@ def start():
                                 occupied[cell].hit()
                                 enemies.remove(occupied.get(cell))
                                 occupied.pop(cell)
+                                score += 1
                 elif blue_piece.is_touched(pos_mouse,main_board.origin, main_board.size):
                     if now >= blue_piece.next_attack:
                        blue_piece.next_attack = now + blue_piece.cooldown
@@ -173,6 +192,7 @@ def start():
                                 occupied[cell].hit()
                                 enemies.remove(occupied.get(cell))
                                 occupied.pop(cell)
+                                score += 1
                 elif green_piece.is_touched(pos_mouse,main_board.origin, main_board.size):
                     if now >= green_piece.next_attack:
                        green_piece.next_attack = now + green_piece.cooldown
@@ -182,19 +202,43 @@ def start():
                                 occupied[cell].hit()
                                 enemies.remove(occupied.get(cell))
                                 occupied.pop(cell)
+                                score += 1
 
         # 勝利判定
-        if not enemies:
-            pygame.draw.circle(screen,(255,0,0),(250,250),200,5)
+        if not enemies and state == "playing":
+            state = "win"
+
+        # 黒駒召喚
+        if state == "playing" and len(enemies) < max_enemies and spawn_time <= now:
+            spawn_candidates = [cell for cell in enemy_spawn_cell if cell not in occupied]
+            if spawn_candidates:
+                cell = random.choice(spawn_candidates)
+                e = enemy.Enemy(
+                settings.BLACK_COLOR,
+                cell,
+                settings.PIECE_RADIUS, 
+                settings.BLACK_COLOR,
+                settings.BLACK_CAN_MOVE,
+                settings.BLACK_INTERVAL_MS,
+                True,
+                0
+                )
+                enemies.append(e)
+                occupied[cell] = e
+            spawn_time = pygame.time.get_ticks() + spawn_interval
+
+
 
         # 黒敵駒たちのAI
         friends_positions = {p.current for p in friends}
         for e in enemies:
+            if state != "playing":
+                continue
             if e.alive and now >= e.next_move_ms:
                 old_cell = e.current
                 can_go_cells = e.can_go_cells(main_board)
                 go_cells = {cell for cell in can_go_cells if cell not in occupied}
-                
+
                 attack_cells = {cell for cell in can_go_cells if cell in friends_positions}
                 new_cell = e.choose_random_cell(go_cells | attack_cells)
                 if new_cell is not None:
@@ -203,35 +247,74 @@ def start():
                         occupied.pop(old_cell, None)
                         occupied[new_cell] = e
                     elif new_cell in attack_cells:
-                        print("gameover")
-                        running = False
+                        state = "gameover"
                 e.next_move_ms = now + e.move_interval
             
 
-
         # スクリプトの描画
-        main_board.draw(screen,highlight_cells,set(attacked_cells_time.keys()))
+        main_board.draw(screen,highlight_cells,set(attacked_cells_time.keys()),state)
         
         red_piece.draw(screen, main_board.size,main_board.origin,selected_piece)
         blue_piece.draw(screen, main_board.size,main_board.origin,selected_piece)
         green_piece.draw(screen, main_board.size,main_board.origin,selected_piece)
         for e in enemies:
-            black_piece.draw(screen, main_board.size,main_board.origin)
+            e.draw(screen, main_board.size,main_board.origin)
+
+        # スコア表示
+        text_score = score_font.render(f"Score: {score}", True, settings.SCORE_FONT_COLOR_PLAY)
+        rect_score = text_score.get_rect()
+        rect_score.topright = (settings.SCREEN_WIDTH - 12, 12)
+        
+        bg = pygame.Surface((rect_score.width + 8, rect_score.height + 8), pygame.SRCALPHA)
+        bg.fill((0, 0, 0, 120))
+        screen.blit(bg, (rect_score.left - 4, rect_score.top - 4))
+        
+        screen.blit(text_score,rect_score)
+
+        # 終了処理
+        if state == "playing":
+            over_time_attacked_cells = [cell for cell, expire in attacked_cells_time.items() if expire < now]
+        elif state == "gameover":
+            over_time_attacked_cells = [cell for cell in attacked_cells_time.items()]
+            selected_piece = None
+            highlight_cells.clear()
+        for cell in list(over_time_attacked_cells):
+            attacked_cells_time.pop(cell,None)
+        
+        if state != "playing":
+                msg = "YOU WIN!" if state == "win" else "GAME OVER"
+                draw_end_overlay(screen, msg, score, settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
 
         # 画面更新
         pygame.display.flip()
         clock.tick(settings.FPS)
-        time += 1
-
-        over_time_attacked_cells = [cell for cell, expire in attacked_cells_time.items() if expire < now]
-
-        for cell in over_time_attacked_cells:
-            attacked_cells_time.pop(cell)
 
 
     # pygameを終了
     pygame.quit()
 
+def draw_end_overlay(screen, msg, score, w, h):
+    """ゲームオーバーorクリア時のメッセージ表示"""
+    # 半透明オーバーレイ
+    overlay = pygame.Surface((w, h), pygame.SRCALPHA)
+    overlay.fill(settings.GAMEOVER_COLOR)
+    screen.blit(overlay, (0, 0))
+
+    # でか文字
+    font_big = pygame.font.SysFont(None, settings.GAMEOVER_FONT_SIZE)
+    text_msg = font_big.render(msg, True, settings.GAMEOVER_FONT_COLOR)
+    rect_msg = text_msg.get_rect(center=(w // 2, h // 2 - 60))
+    screen.blit(text_msg, rect_msg)
+
+    # スコア
+    font_score = pygame.font.SysFont(None, settings.SCORE_FONT_SIZE)
+    text_score = font_score.render(f"Score: {score}", True, settings.SCORE_FONT_COLOR)
+    rect_score = text_score.get_rect(center=(w // 2, h // 2 + 40))
+    screen.blit(text_score, rect_score)
+
+
+
 # start関数の実行
 if __name__ == "__main__":
     start()
+

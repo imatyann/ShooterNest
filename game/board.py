@@ -2,17 +2,18 @@ import pygame
 from . import settings
 
 class Board:
-    def __init__(self, width, height, color, origin, size, highlight_color,attacked_color):
+    def __init__(self, width, height, color, origin, size, highlight_color,highlight_edge_color,attacked_color):
         self.width = width
         self.height = height
         self.color = color
         self.origin = origin
         self.size = size
         self.highlight_color = highlight_color
+        self.highlight_edge_color = highlight_edge_color
         self.attacked_color = attacked_color
 
 
-    def draw(self,screen,highlight_cells = None,attacked_cells = None):
+    def draw(self,screen,highlight_cells = None,attacked_cells = None,state = "playing"):
         for i in range(self.height):
             for j in range(self.width):
                 pygame.draw.rect(screen,
@@ -30,19 +31,23 @@ class Board:
                                   self.size * self.height),
                                  width=4)
         for cell in highlight_cells:
-            self.be_highlight_cell(cell,screen)
+            overlay = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
+            self.be_highlight_cell(cell,screen,overlay)
+            
         for cell in attacked_cells:
             self.be_attacked_cell(cell,screen)
-        
-    def be_highlight_cell(self,cell,screen):
-        pygame.draw.rect(screen,
-                    self.highlight_color,
-                    (self.origin[0] + cell[0] * self.size,
-                    self.origin[1] + cell[1] * self.size, 
-                    self.size, 
-                    self.size),
-                    width=2
-                    )
+
+        if state == "gameover":
+            # ここにGAMEOVER処理を挿入
+            # screen.fill(self.gameover_color)
+            pass
+            
+    def be_highlight_cell(self,cell,screen,overlay):
+        x = self.origin[0] + cell[0] * self.size
+        y = self.origin[1] + cell[1] * self.size
+        overlay.fill(self.highlight_color)
+        screen.blit(overlay, (x, y))
+        pygame.draw.rect(screen,self.highlight_edge_color,(x,y,self.size, self.size),width=2)
     
     def be_attacked_cell(self,cell,screen):
         pygame.draw.rect(screen,

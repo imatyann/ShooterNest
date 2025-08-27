@@ -5,11 +5,11 @@ from . import settings
 
 class Piece:
 
-    def __init__(self,color,current,radius,width_color,selected_color,can_move,can_attack,duration,cooldown,next_attack):
+    def __init__(self,color,current,radius,edge_color,selected_color,can_move,can_attack,duration,cooldown,next_attack):
         self.color = color
         self.current = current
         self.radius = radius
-        self.width_color = width_color
+        self.edge_color = edge_color
         self.selected_color = selected_color
         self.can_move = can_move
         self.can_attack = can_attack
@@ -37,14 +37,14 @@ class Piece:
                            current_radius,
                            )
         pygame.draw.circle(screen, 
-                        self.width_color, 
+                        self.edge_color, 
                         self.center_pos(origin,board_square_size),
                         current_radius,
                         width = 1)
 
         left = self.cooldown_left()
         if left > 0:
-            font = pygame.font.SysFont(None, max(14, int(self.radius)))
+            font = pygame.font.SysFont(None, max(50, int(self.radius)))
             text_surf = font.render(str(math.ceil(left)), True, (255, 255, 255))
             rect = text_surf.get_rect(center=self.center_pos(origin,board_square_size))
             screen.blit(text_surf,rect)
